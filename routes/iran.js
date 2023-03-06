@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const iran = require("../models/iran");
+const { count } = require("../models/user");
 
 function mapArray(inputArray){
     let outputArray = inputArray.map(element => (
@@ -39,20 +40,46 @@ router.get("/", (req, res)=>{
         .catch(err => {res.status(500).send({message : err.message})})
 });
 
-//get by name
-router.get("/name/:name", (req, res)=>{
-    iran.find({name: {$regex: req.params.name}})
-        .then(data => res.send(mapArray(data)))
-        .catch(err => res.status(500).send({message : err.message}))
+//Random Historical Place
+router.get("/random", (req, res) => {
+    iran.countDocuments({})
+        .then(count => {
+            let random = Math.floor(Math.random() * count);
+
+            iran.findOne().skip(random)
+                .then(data => {res.status(200).send(mapData(data))})
+                .catch(err => {
+                    res.status(500).send({message : err.message})
+                })
+        })
 });
 
 
+router.get("/:field/:value", (request, response) => {   
+    
+    const field = request.params.field;
+    const value = request.params.value;
+    
+    iran.find({ [field]: { $regex: request.params.value, $options:'i' } })
+    .then (data => { response.send(data) })  
+    .catch (err => { 
+        response.status(500).send( { message: err.message } )
+    })
+});
+//get by name
+// router.get("/name/:name", (req, res)=>{
+//     iran.find({name: {$regex: req.params.name}})
+//         .then(data => res.send(mapArray(data)))
+//         .catch(err => res.status(500).send({message : err.message}))
+// });
+
+
 //get by location
-router.get("/location/:location", (req, res) => {
-    iran.find({location : {$regex: req.params.location}})
-    .then(data => res.send(mapArray(data)))
-    .catch(err => res.status(500).send({message : err.message}))
-})
+// router.get("/location/:location", (req, res) => {
+//     iran.find({location : {$regex: req.params.location}})
+//     .then(data => res.send(mapArray(data)))
+//     .catch(err => res.status(500).send({message : err.message}))
+// })
 
 //get(read) by Id
 router.get("/:id", (req, res)=>{
