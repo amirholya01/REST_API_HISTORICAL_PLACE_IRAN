@@ -1,0 +1,250 @@
+openapi: 3.0.0
+info:
+  title: IRAN API
+  description: MongoDB ExpressJS NodeJS REST API
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000/api/
+    description: Localhost development server
+  - url: https://men-restapi-easv-s23.onrender.com/api/
+    description: Remote deployment
+
+
+
+components:
+  securitySchemes:
+    ApiKeyAuth:        # arbitrary name for the security scheme
+      type: apiKey
+      in: header       # can be "header", "query" or "cookie"
+      name: auth-token
+
+  schemas:
+    Iran:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        location:
+          type: string
+        builder: 
+          type: string
+        officialName:
+          type: string
+        event:
+          type: string
+    
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        date:
+          type: string
+
+paths:
+
+  /user/register:
+    post:
+      summary: Register a new User
+      description: Register a new User in the database
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+
+      responses:
+        201:
+          description: User created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  _id:
+                    type: string
+
+  /user/login:
+    post:
+      summary: Login a User
+      description: Login a User in order to get JWT token (auth-token)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      
+      responses:
+        200:
+          description: User logged in succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  data:
+                    type: string
+
+
+  /iran:
+    get:
+      summary: see all historical place in Iran
+      description: Retrieves a list of Iran as JSON objects.
+      responses:
+        200:
+          description: A list of Iran palces JSON objects in an array.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Iran"
+    
+    post:
+      summary: Create a new Iran
+      description: Create a new historical place in Iran
+      security:
+        - ApiKeyAuth: []      
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Iran"
+
+      responses:
+        201:
+          description: Iran created succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Iran"
+  
+  /iran/{id}:
+    get:
+      summary: Specific iran historical place
+      description: Retrieves a specific Iran historical place based on it id.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      responses:
+        200:
+          description: A Iran in the format of a JSON object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Iran"
+   
+    put:
+      summary: Updates a specific Iran historical palces
+      description: Updates a specific Iran based on it id
+      security:
+        - ApiKeyAuth: []            
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Iran"
+
+      responses:
+        201:
+          description: Iran updated succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Iran"
+
+    delete:
+      summary: Deletes a specific Iran
+      description: Deletes a specific Iran based on it id
+      security:
+        - ApiKeyAuth: []            
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: MongoDB id
+          schema:
+            type: string      
+
+      responses:
+        201:
+          description: Iran deleted succesfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Iran"
+  /iran/name/{name}:
+    get:
+       summary: Specific iran historical place by name -- searching by name
+       description: Retrieves a specific Iran historical place based on it name.
+       parameters:
+        - in: path
+          name: name
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+       responses:
+        200:
+          description: A Iran in the format of a JSON object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Iran"
+  /iran/location/{location}:
+    get:
+       summary: Specific iran historical place by location -- searching by location
+       description: Retrieves a specific Iran historical place based on it location.
+       parameters:
+        - in: path
+          name: location
+          required: true
+          description: MongoDB id
+          schema:
+            type: string
+       responses:
+        200:
+          description: A Iran in the format of a JSON object.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Iran"
+    
